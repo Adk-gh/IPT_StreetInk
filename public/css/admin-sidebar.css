@@ -1,4 +1,4 @@
-  :root {
+ :root {
             --primary: #1a1a1a;
             --secondary: #f5f5f5;
             --accent: #ff5e5b;
@@ -23,26 +23,6 @@
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
-        [data-theme="dark"] .form-control[readonly],
-        [data-theme="dark"] .form-control:disabled {
-            color: var(--text) !important;
-            background-color: rgba(255, 255, 255, 0.1) !important;
-        }
-
-        [data-theme="dark"] .form-control::placeholder {
-            color: var(--text-light) !important;
-            opacity: 1;
-        }
-
-        [data-theme="dark"] select.form-control {
-            color: var(--text) !important;
-        }
-
-        [data-theme="dark"] select.form-control option {
-            color: var(--text);
-            background-color: var(--white);
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -57,35 +37,25 @@
             overflow-x: hidden;
         }
 
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            line-height: 1.2;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-            transition: var(--transition);
-        }
-         /* Sidebar */
         .sidebar {
             width: var(--sidebar-width);
             background-color: var(--white);
             box-shadow: var(--shadow);
             position: fixed;
             height: 100vh;
-            transition: var(--transition);
-            z-index: 100;
+            top: 0;
+            left: 0;
+            transition: transform var(--transition), box-shadow 0.3s ease, background-color 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
         }
-.sidebar.active {
-    background-color: rgba(255, 94, 91, 0.05); /* subtle background tint */
-    box-shadow: 0 0 15px rgba(255, 94, 91, 0.3); /* soft red glow */
-    border-right: 2px solid var(--accent); /* optional accent border */
-}
-.sidebar {
-    transition: var(--transition), box-shadow 0.3s ease, background-color 0.3s ease;
-}
+
+        .sidebar.active {
+            background-color: rgba(255, 94, 91, 0.05);
+            box-shadow: 0 0 15px rgba(255, 94, 91, 0.3);
+            border-right: 2px solid var(--accent);
+            transform: translateX(0);
+        }
 
         .sidebar-header {
             padding: 20px;
@@ -108,11 +78,24 @@
 
         .sidebar-menu {
             padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
-        .sidebar.active .menu-item.active {
-    background-color: rgba(255, 94, 91, 0.2); /* Darker highlight when sidebar is active */
-    box-shadow: 0 0 10px rgba(255, 94, 91, 0.1); /* Optional: add a subtle glow */
-}
+
+        .menu-items-top {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+
+        .menu-items-bottom {
+            margin-top: auto;
+            padding: 15px 0;
+            background: var(--white);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
         .menu-title {
             padding: 10px 20px;
             font-size: 0.8rem;
@@ -129,6 +112,7 @@
             cursor: pointer;
             transition: var(--transition);
             border-left: 3px solid transparent;
+            color: var(--text);
         }
 
         .menu-item:hover {
@@ -155,7 +139,42 @@
             padding: 3px 6px;
             border-radius: 10px;
         }
-         /* Responsive */
+
+        .mobile-menu-btn {
+            display: none;
+            background: var(--white);
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary);
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .backdrop.active {
+            display: block;
+            opacity: 1;
+        }
+
         @media (max-width: 1200px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -165,73 +184,18 @@
                 transform: translateX(0);
             }
 
-            .main-content {
-                margin-left: 0;
-            }
-
             .mobile-menu-btn {
                 display: block;
             }
         }
 
-        @media (max-width: 992px) {
-            .dashboard {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .form-row {
-                flex-direction: column;
-                gap: 0;
-            }
-        }
-
         @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .header-right {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .search-input {
-                width: 200px;
-            }
-
-            .search-input:focus {
-                width: 200px;
-            }
-
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
-
-            .card-grid {
-                grid-template-columns: 1fr;
+            .sidebar {
+                width: 80%;
+                max-width: 280px;
             }
         }
 
-        @media (max-width: 576px) {
-            .table-actions {
-                flex-direction: column;
-                gap: 5px;
-            }
-
-            .action-btns {
-                flex-direction: column;
-                gap: 5px;
-            }
-
-            .pagination {
-                flex-direction: column;
-                gap: 15px;
-            }
-        }
-
-        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;

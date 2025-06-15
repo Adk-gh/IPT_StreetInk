@@ -15,50 +15,62 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="resources/css/admin-sidebar.css" rel="stylesheet">
     <script src="resources/js/admin-sidebar.js" defer></script>
-</head>
-<body>
-   <!-- Mobile Menu Button -->
+   
+</head> <!-- Backdrop for mobile view -->
+    <div class="backdrop" id="backdrop"></div>
+
+    <!-- Mobile Menu Button -->
     <button class="mobile-menu-btn" id="mobileMenuBtn">
         <i class="fas fa-bars"></i>
     </button>
 
-      <!-- Sidebar -->
-      <div class="sidebar" id="sidebar">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">Street & <span>Ink</span></div>
         </div>
 
         <div class="sidebar-menu">
-            <div class="menu-title">Main</div>
-            <a href="{{ route('admin.dashboard') }}" class="menu-item active">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-            </a>
-            <div class="menu-title">Management</div>
-            <a href="{{ route('admin.UserManagement') }}" class="menu-item">
-                <i class="fas fa-users"></i>
-                <span>User Management</span>
+            <div class="menu-items-top">
+                <div class="menu-title">Main</div>
+                <a href="{{ route('admin.dashboard') }}" class="menu-item active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <div class="menu-title">Management</div>
+                <a href="{{ route('admin.UserManagement') }}" class="menu-item">
+                    <i class="fas fa-users"></i>
+                    <span>User Management</span>
+                </a>
+                <a href="{{ route('admin.ArtUpload') }}" class="menu-item">
+                    <i class="fas fa-paint-brush"></i>
+                    <span>Art Uploads</span>
+                </a>
+                <a href="{{ route('admin.Reports') }}" class="menu-item">
+                    <i class="fas fa-flag"></i>
+                    <span>Reports & Moderation</span>
+                </a>
+            </div>
 
-            </a>
-            <a href="{{ route('admin.ArtUpload') }}" class="menu-item">
-                <i class="fas fa-paint-brush"></i>
-                <span>Art Uploads</span>
+            <div class="menu-items-bottom">
+                <div class="menu-title">Account</div>
+                <a href="{{ route('profile') }}" class="menu-item">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="{{ route('admin.Settings') }}" class="menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="#" class="menu-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Log out</span>
+                </a>
 
-            </a>
-            <a href="{{ route('admin.Reports') }}" class="menu-item">
-                <i class="fas fa-flag"></i>
-                <span>Reports & Moderation</span>
-            </a>
-            <a href="{{ route('admin.Location') }}" class="menu-item">
-                <i class="fas fa-map-marked-alt"></i>
-                <span>Location Management</span>
-            </a>
-            <a href="{{ route('admin.ArtistPartners') }}" class="menu-item">
-                <i class="fas fa-palette"></i>
-                <span>Artist & Partners</span>
-                
-            </a>
-
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+            </div>
         </div>
     </div>
 

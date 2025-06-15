@@ -163,8 +163,6 @@
     $originalPost = $isShared ? $post->post : $post;
     $sharedByUser = $isShared ? $post->user : null;
     $originalAuthor = $originalPost->user;
-
-    // ✅ Important fix here: $commentable is the actual post object — shared or original
     $commentable = $post;
 @endphp
 

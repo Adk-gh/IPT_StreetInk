@@ -1,704 +1,400 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Like Button Functionality
-    document.querySelectorAll('.like-btn').forEach(button => {
-        button.addEventListener('click', async (e) => {
-            e.preventDefault();
+    // ========== Mobile Menu ==========
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const nav = document.querySelector('nav');
 
-            const postCard = e.target.closest('.post-card');
-            const postId = button.getAttribute('data-post-id');
-            const isLiked = button.getAttribute('data-liked') === 'true';
-            const url = isLiked ? `/posts/${postId}/unlike` : `/posts/${postId}/like`;
-            const method = isLiked ? 'DELETE' : 'POST';
-
-            if (!postId) {
-                console.error('Error: Missing post ID for like/unlike action');
-                return;
-            }
-
-            console.log(`Initiating ${isLiked ? 'unlike' : 'like'} for post ${postId}, user ${getUserId()}`);
-
-            try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    },
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // Update UI
-                    const likeCountSpan = button.querySelector('.like-count');
-                    likeCountSpan.textContent = data.likes_count;
-
-                    const icon = button.querySelector('i');
-                    if (data.liked) {
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                        button.setAttribute('data-liked', 'true');
-                    } else {
-                        icon.classList.remove('fas');
-                        icon.classList.add('far');
-                        button.setAttribute('data-liked', 'false');
-                    }
-
-                    // Animation effect
-                    button.style.transform = 'scale(1.2)';
-                    setTimeout(() => {
-                        button.style.transform = 'scale(1)';
-                    }, 300);
-
-                    console.log(`Success: ${data.message}, Likes: ${data.likes_count}, Liked: ${data.liked}`);
-                } else {
-                    console.error(`Error: ${data.message || 'Unknown error'}`);
-                    showToast(`Error: ${data.message || 'Failed to process like/unlike action'}`);
-                }
-            } catch (error) {
-                console.error(`Fetch error: ${error.message}`);
-                showToast('Failed to process like/unlike action.');
-                console.error('Error liking/unliking post:', error);
-            }
-        });
+    menuBtn?.addEventListener('click', () => {
+        nav?.classList.toggle('active');
+        menuBtn.classList.toggle('active');
     });
 
-    // Function to get user ID
-    function getUserId() {
-        const userIdMeta = document.querySelector('meta[name="user-id"]');
-        return userIdMeta ? userIdMeta.getAttribute('content') : 'unknown';
-    }
+    // ========== Header on Scroll ==========
+    const header = document.querySelector('header');
+    window.addEventListener('scroll', () => {
+        header?.classList.toggle('scrolled', window.scrollY > 50);
+    });
 
-    // Mobile Menu Toggle
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const nav = document.getElementById('nav');
-
-    if (mobileMenuBtn && nav) {
-        mobileMenuBtn.addEventListener('click', () => {
-            nav.classList.toggle('active');
-            mobileMenuBtn.innerHTML = nav.classList.contains('active') ?
-                '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
-        });
-    }
-
-    // Header Scroll Effect
-    const header = document.getElementById('header');
-    if (header) {
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 100) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
-    }
-
-    // Smooth Scrolling for Anchor Links
+    // ========== Smooth Scrolling ==========
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
+        anchor.addEventListener('click', e => {
             e.preventDefault();
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
-
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                window.scrollTo({
-                    top: targetElement.offsetTop - 80,
-                    behavior: 'smooth'
-                });
-
-                if (nav && nav.classList.contains('active')) {
-                    nav.classList.remove('active');
-                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-                }
-            }
-        });
-    });
-
-    // Feed Tabs
-    const feedTabs = document.querySelectorAll('.feed-tab');
-    feedTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            feedTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            console.log(`Feed tab switched to ${tab.textContent}`);
-        });
-    });
-
-    // Dark Mode Toggle
-    const themeToggle = document.getElementById('themeToggle');
-    const body = document.body;
-
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            body.setAttribute('data-theme',
-                body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-            localStorage.setItem('theme', body.getAttribute('data-theme'));
-            themeToggle.innerHTML = body.getAttribute('data-theme') === 'dark' ?
-                '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-            console.log(`Theme toggled to ${body.getAttribute('data-theme')}`);
-        });
-
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            body.setAttribute('data-theme', savedTheme);
-            themeToggle.innerHTML = savedTheme === 'dark' ?
-                '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-        }
-    }
-
-    // Share Button Functionality
-    const shareButtons = document.querySelectorAll('.share-btn');
-    shareButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            console.log('Share button clicked');
-            showToast('Share functionality would open a dialog with sharing options.');
-            button.style.transform = 'scale(1.2)';
-            setTimeout(() => {
-                button.style.transform = 'scale(1)';
-            }, 300);
-        });
-    });
-
-    // Save Button Functionality
-    const saveButtons = document.querySelectorAll('.save-btn');
-    saveButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const icon = this.querySelector('i');
-            const isSaved = this.classList.contains('saved');
-
-            if (isSaved) {
-                this.classList.remove('saved');
-                icon.classList.replace('fas', 'far');
-                console.log('Post unsaved');
-            } else {
-                this.classList.add('saved');
-                icon.classList.replace('far', 'fas');
-                console.log('Post saved');
-            }
-
-            button.style.transform = 'scale(1.2)';
-            setTimeout(() => {
-                button.style.transform = 'scale(1)';
-            }, 300);
-        });
-    });
-
-    // Follow Button Functionality
-    const followButtons = document.querySelectorAll('.follow-btn');
-    followButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const isFollowing = this.classList.contains('following');
-            if (isFollowing) {
-                this.classList.remove('following');
-                this.textContent = 'Follow';
-                console.log('User unfollowed');
-            } else {
-                this.classList.add('following');
-                this.textContent = 'Following';
-                console.log('User followed');
-            }
-
-            button.style.transform = 'scale(1.1)';
-            setTimeout(() => {
-                button.style.transform = 'scale(1)';
-            }, 300);
-        });
-    });
-
-    // Comment Submission
-    const commentForms = document.querySelectorAll('.add-comment');
-    commentForms.forEach(form => {
-        const input = form.querySelector('.comment-input');
-        const submit = form.querySelector('.comment-submit');
-
-        if (submit) {
-            submit.addEventListener('click', () => {
-                if (input.value.trim() !== '') {
-                    console.log(`Comment submitted: ${input.value}`);
-                    input.value = '';
-                }
+            document.querySelector(anchor.getAttribute('href'))?.scrollIntoView({
+                behavior: 'smooth'
             });
-        }
+        });
+    });
 
-        if (input) {
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && input.value.trim() !== '') {
-                    console.log(`Comment submitted via Enter: ${input.value}`);
-                    input.value = '';
-                }
+    // ========== Theme Toggle ==========
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle?.addEventListener('click', () => {
+        const darkMode = document.body.classList.toggle('dark-theme');
+        localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+    });
+
+    // Load saved theme
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-theme');
+    }
+
+    // ========== Interactive Map ==========
+    // Define map layers// Light (Carto Light - clean, modern look)
+const lightLayer = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, Tiles &copy; Humanitarian OpenStreetMap Team'
+});
+
+
+
+
+// Dark (Carto Dark - optimized for nighttime/dark UI)
+const darkLayer = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
+    maxZoom: 20,
+    attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>'
+});
+
+
+// Satellite (Esri World Imagery - high quality satellite tiles)
+const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 60,
+    attribution: '&copy; <a href="https://www.esri.com/">Esri</a>, Maxar, Earthstar Geographics'
+});
+
+    // Initialize map with the light layer
+    const map = L.map("streetArtMap", {
+        layers: [lightLayer],
+        zoomControl: false
+    }).setView([14.0555, 121.3250], 13);
+
+    // Add zoom control with position
+    L.control.zoom({
+        position: 'topright'
+    }).addTo(map);
+
+    // Layer arrays and index
+    const layers = [lightLayer, darkLayer, satelliteLayer];
+    const layerNames = ['Light', 'Dark', 'Satellite'];
+    let currentIndex = 0;
+
+    // Create a custom Leaflet control for theme toggle
+    const ThemeToggleControl = L.Control.extend({
+        options: {
+            position: 'topleft'
+        },
+        onAdd: function () {
+            const container = L.DomUtil.create('button', 'leaflet-bar leaflet-control leaflet-control-custom');
+            container.style.backgroundColor = 'white';
+            container.style.width = '90px';
+            container.style.height = '30px';
+            container.style.lineHeight = '30px';
+            container.style.textAlign = 'center';
+            container.style.cursor = 'pointer';
+            container.style.fontWeight = '600';
+            container.title = 'Toggle map theme';
+
+            container.textContent = layerNames[currentIndex];
+
+            L.DomEvent.disableClickPropagation(container);
+
+            container.addEventListener('click', () => {
+                map.removeLayer(layers[currentIndex]);
+                currentIndex = (currentIndex + 1) % layers.length;
+                map.addLayer(layers[currentIndex]);
+                container.textContent = layerNames[currentIndex];
             });
+
+            return container;
         }
     });
 
-    // Post Options Menu
-    const postOptions = document.querySelectorAll('.post-options');
-    postOptions.forEach(option => {
-        option.addEventListener('click', () => {
-            console.log('Post options menu clicked');
-            showToast('Post options menu would appear with options to report, save, or edit post.');
-        });
-    });
+    // Add the custom control to map
+    map.addControl(new ThemeToggleControl());
 
-    // Create Post Functionality
-    const createPostBtn = document.querySelector('.create-post .btn-primary');
-    if (createPostBtn) {
-        createPostBtn.addEventListener('click', () => {
-            const postInput = document.querySelector('.post-input');
-            if (postInput && postInput.value.trim() !== '') {
-                console.log(`New post submitted: ${postInput.value}`);
-                postInput.value = '';
-            }
-        });
-    }
+    let clusteredMarkers;
 
-    // Tag Click Functionality
-    const tags = document.querySelectorAll('.post-tag, .trending-tag');
-    tags.forEach(tag => {
-        tag.addEventListener('click', function(e) {
-            e.preventDefault();
-            const tagText = this.textContent.replace('#', '');
-            console.log(`Tag clicked: ${tagText}`);
-            this.style.transform = 'scale(1.1)';
-            setTimeout(() => {
-                this.style.transform = 'scale(1)';
-            }, 300);
-        });
-    });
-
-    // Location Click Functionality
-    const locations = document.querySelectorAll('.location-item');
-    locations.forEach(location => {
-        location.addEventListener('click', function(e) {
-            e.preventDefault();
-            const locationName = this.querySelector('.location-name')?.textContent || 'Unknown';
-            console.log(`Location clicked: ${locationName}`);
-        });
-    });
-
-    // Map Location Variables
-    const locationToggle = document.getElementById('locationToggle');
-    const locationModal = document.getElementById('locationModal');
-    const closeModal = document.getElementById('closeModal');
-    const saveLocation = document.getElementById('saveLocation');
-    const clearLocation = document.getElementById('clearLocation');
-    const locationNameInput = document.getElementById('location_name');
-
-    let map, marker;
-    let mapInitialized = false;
-
-    if (locationToggle) {
-        locationToggle.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (locationModal) {
-                locationModal.style.display = 'flex';
-                console.log('Location modal opened');
-
-                if (!mapInitialized) {
-                    initializeMap();
-                    mapInitialized = true;
-                }
-            } else {
-                console.error('Location modal element not found');
-            }
-        });
-    }
-
-    if (closeModal) {
-        closeModal.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (locationModal) {
-                locationModal.style.display = 'none';
-                console.log('Location modal closed');
-            }
-        });
-    }
-
-    if (locationModal) {
-        locationModal.addEventListener('click', (e) => {
-            if (e.target === locationModal) {
-                locationModal.style.display = 'none';
-                console.log('Location modal closed by clicking outside');
-            }
-        });
-    }
-
-    if (saveLocation) {
-        saveLocation.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (locationModal && locationNameInput) {
-                locationModal.style.display = 'none';
-                const locationName = locationNameInput.value;
-                const latitudeInput = document.getElementById('latitude');
-                const longitudeInput = document.getElementById('longitude');
-                const lat = latitudeInput ? latitudeInput.value : '';
-                const lng = longitudeInput ? longitudeInput.value : '';
-                console.log(`Location saved: ${locationName}, Lat: ${lat}, Lng: ${lng}`);
-                const locationPreview = document.getElementById('locationPreview');
-                if (locationPreview) {
-                    if (locationName) {
-                        locationPreview.textContent = locationName;
-                        locationPreview.style.display = 'block';
-                    } else {
-                        locationPreview.style.display = 'none';
-                    }
-                }
-            } else {
-                console.error('Location modal or input elements not found');
-            }
-        });
-    }
-
-    if (clearLocation) {
-        clearLocation.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (marker && map) {
-                map.removeLayer(marker);
-                marker = null;
-            }
-            const latitudeInput = document.getElementById('latitude');
-            const longitudeInput = document.getElementById('longitude');
-            if (latitudeInput) latitudeInput.value = '';
-            if (longitudeInput) longitudeInput.value = '';
-            if (locationNameInput) locationNameInput.value = '';
-            const locationPreview = document.getElementById('locationPreview');
-            if (locationPreview) {
-                locationPreview.style.display = 'none';
-                locationPreview.innerText = '';
-            }
-            if (map) {
-                map.setView([14.0555, 121.3250], 13);
-            }
-            console.log('Location cleared');
-        });
-    }
-
-    function initializeMap() {
-        if (typeof L === 'undefined') {
-            console.error('Leaflet library is not loaded');
-            return;
-        }
-        const mapContainer = document.getElementById('map');
-        if (!mapContainer) {
-            console.error('Map container element not found');
-            return;
-        }
-        map = L.map('map').setView([14.0555, 121.3250], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
-        map.on('click', function(e) {
-            const { lat, lng } = e.latlng;
-            placeMarker([lat, lng]);
-            reverseGeocode(lat, lng);
-            console.log(`Map clicked: Lat ${lat.toFixed(4)}, Lng ${lng.toFixed(4)}`);
-        });
-    }
-
-    function placeMarker(coords) {
-        if (!map) return;
-        if (marker) {
-            marker.setLatLng(coords);
-        } else {
-            marker = L.marker(coords, { draggable: true }).addTo(map);
-            marker.on('dragend', function(event) {
-                const position = event.target.getLatLng();
-                updateLatLng(position.lat, position.lng);
-                reverseGeocode(position.lat, position.lng);
-                console.log(`Marker dragged: Lat ${position.lat.toFixed(4)}, Lng ${position.lng.toFixed(4)}`);
-            });
-        }
-        updateLatLng(coords[0], coords[1]);
-        map.panTo(coords);
-    }
-
-    function updateLatLng(lat, lng) {
-        const latitudeInput = document.getElementById('latitude');
-        const longitudeInput = document.getElementById('longitude');
-        if (latitudeInput) latitudeInput.value = lat;
-        if (longitudeInput) longitudeInput.value = lng;
-    }
-
-    async function reverseGeocode(lat, lng) {
-        if (!locationNameInput) {
-            console.error('Location name input not found');
-            return;
-        }
+    async function loadPostMarkers() {
         try {
-            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-            const data = await response.json();
-            if (data.display_name) {
-                locationNameInput.value = data.display_name;
-                console.log(`Reverse geocoded: ${data.display_name}`);
-            } else {
-                locationNameInput.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-                console.log(`Reverse geocoding failed, using coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
-            }
-        } catch (error) {
-            locationNameInput.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-            console.error(`Geocoding error: ${error.message}`);
-        }
-    }
+            const res = await fetch('/api/posts');
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            const posts = await res.json();
 
-    // Tags Dropdown Functionality
-    const selectedTags = new Set();
-    const tagsButton = document.getElementById('tagsButton');
-    if (tagsButton) {
-        tagsButton.addEventListener('click', async () => {
-            const dropdown = document.getElementById('tagsDropdown');
-            if (!dropdown) {
-                console.error('Tags dropdown element not found');
-                return;
-            }
-            if (dropdown.style.display === 'block') {
-                dropdown.style.display = 'none';
-                console.log('Tags dropdown closed');
-                return;
-            }
+            clusteredMarkers = L.markerClusterGroup({
+                spiderfyOnMaxZoom: true,
+                showCoverageOnHover: false,
+                zoomToBoundsOnClick: true,
+                maxClusterRadius: 60
+            });
 
-            dropdown.style.display = 'block';
-            dropdown.innerHTML = 'Loading tags...';
-            console.log('Fetching tags for dropdown');
+            posts.forEach(post => {
+                const originalPost = post.post || post;
 
-            try {
-                const response = await fetch('/tags/list');
-                if (!response.ok) throw new Error('Failed to fetch tags');
-
-                const tags = await response.json();
-                if (tags.length === 0) {
-                    dropdown.innerHTML = '<em>No tags found</em>';
-                    console.log('No tags found');
+                // Skip if no coordinates
+                if (!originalPost.latitude || !originalPost.longitude) {
+                    console.warn('Missing coordinates for post:', originalPost.id);
                     return;
                 }
 
-                const tagItems = tags.map(tag => {
-                    const isSelected = selectedTags.has(tag.name);
-                    return `
-                        <div class="tag-item${isSelected ? ' selected' : ''}" data-name="${tag.name}">
-                            ${tag.name}
-                        </div>
-                    `;
-                }).join('');
+                const lat = parseFloat(originalPost.latitude);
+                const lng = parseFloat(originalPost.longitude);
 
-                dropdown.innerHTML = `
-                    <div id="tagListContainer">${tagItems}</div>
-                    <button type="button" id="doneSelectingTags" style="margin-top: 10px; width: 100%; padding: 8px; background-color:rgb(226, 97, 74); color: white; border: none; border-radius: 6px; cursor: pointer;">
-                        Done
-                    </button>
-                `;
+                // Get user data with fallbacks
+                const user = originalPost.user || {};
+                const userName = user.name || 'Unknown User';
+                const userEmail = user.email || '';
+                const userAvatar = user.profile_picture
+                    ? user.profile_picture.startsWith('http')
+                        ? user.profile_picture
+                        : user.profile_picture
+                    : '/img/default-avatar.jpg';
 
-                dropdown.querySelectorAll('.tag-item').forEach(tagEl => {
-                    tagEl.addEventListener('click', () => {
-                        const tagName = tagEl.dataset.name;
-                        if (selectedTags.has(tagName)) {
-                            selectedTags.delete(tagName);
-                            tagEl.classList.remove('selected');
-                            console.log(`Tag deselected: ${tagName}`);
-                        } else {
-                            selectedTags.add(tagName);
-                            tagEl.classList.add('selected');
-                            console.log(`Tag selected: ${tagName}`);
-                        }
-                        const selectedTagsInput = document.getElementById('selectedTagsInput');
-                        if (selectedTagsInput) {
-                            selectedTagsInput.value = Array.from(selectedTags).join(',');
-                        }
-                    });
+                // Get post data with fallbacks
+                const location = originalPost.location_name || 'Unknown location';
+                const description = originalPost.caption || '';
+                const createdAt = originalPost.created_at
+                    ? new Date(originalPost.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })
+                    : 'Unknown date';
+
+                const imageUrl = originalPost.image_url
+                    ? originalPost.image_url.startsWith('http')
+                        ? originalPost.image_url
+                        : `/storage/${originalPost.image_url.replace(/^storage\/|^public\//, '')}`
+                    : null;
+
+                // Create marker icon
+                const markerIcon = L.divIcon({
+                    html: `<div style="
+                        width: 40px;
+                        height: 40px;
+                        background: url('${userAvatar}');
+                        background-size: cover;
+                        border-radius: 50%;
+                        border: 2px solid white;
+                        box-shadow: 0 0 5px rgba(0,0,0,0.3);
+                    "></div>`,
+                    className: 'custom-marker',
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 40]
                 });
 
-                const doneButton = document.getElementById('doneSelectingTags');
-                if (doneButton) {
-                    doneButton.addEventListener('click', () => {
-                        dropdown.style.display = 'none';
-                        console.log('Tags dropdown closed with Done button');
-                    });
+                // Create marker
+                const marker = L.marker([lat, lng], {
+                    icon: markerIcon,
+                    title: description || 'Post location',
+                    riseOnHover: true,
+                    zIndexOffset: 1000
+                });
+
+                // Modern minimalist popup content
+                const popupContent = `
+                <div class="post-popup" style="
+                    width: 320px;
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+                ">
+                    <!-- Header Section -->
+                    <div style="
+                        display: flex;
+                        align-items: center;
+                        padding: 16px;
+                        background: #ffffff;
+                        border-bottom: 1px solid #f0f0f0;
+                    ">
+                        <img src="${userAvatar}"
+                             style="
+                                width: 48px;
+                                height: 48px;
+                                border-radius: 50%;
+                                object-fit: cover;
+                                margin-right: 12px;
+                                border: 1px solid #f5f5f5;
+                             "
+                             onerror="this.src='/img/default-avatar.jpg'">
+                        <div>
+                            <h4 style="
+                                margin: 0 0 4px 0;
+                                font-size: 15px;
+                                font-weight: 600;
+                                color: #222;
+                            ">${userName}</h4>
+                            <small style="
+                                color: #888;
+                                font-size: 13px;
+                                display: flex;
+                                align-items: center;
+                                gap: 4px;
+                            ">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                                ${location}
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Post Image -->
+                    ${imageUrl ? `
+                    <div style="
+                        width: 100%;
+                        height: 220px;
+                        background: #f9f9f9;
+                    ">
+                        <img src="${imageUrl}"
+                             style="
+                                width: 100%;
+                                height: 100%;
+                                object-fit: cover;
+                                display: block;
+                             "
+                             onerror="this.style.display='none'">
+                    </div>` : ''}
+
+                    <!-- Content Section -->
+                    <div style="padding: 16px; background: #ffffff;">
+                        <!-- Date -->
+                        <div style="
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                            margin-bottom: 12px;
+                            color: #888;
+                            font-size: 13px;
+                        ">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            ${createdAt}
+                        </div>
+
+                        <!-- Post Caption -->
+                        ${description ? `
+                        <div style="
+                            margin-bottom: 16px;
+                            color: #333;
+                            font-size: 15px;
+                            line-height: 1.5;
+                        ">
+                            ${description}
+                        </div>` : ''}
+
+                        <!-- Tags -->
+                        ${originalPost.tags && originalPost.tags.length ? `
+                        <div style="
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 6px;
+                            margin-top: 12px;
+                        ">
+                            ${originalPost.tags.map(tag => `
+                                <span style="
+                                    background: #f0f0f0;
+                                    color: #555;
+                                    padding: 4px 10px;
+                                    border-radius: 20px;
+                                    font-size: 12px;
+                                ">#${tag}</span>
+                            `).join('')}
+                        </div>` : ''}
+                    </div>
+                </div>`;
+
+                marker.bindPopup(popupContent, {
+                    maxWidth: 320,
+                    minWidth: 320,
+                    className: 'modern-popup',
+                    autoPanPaddingTopLeft: [20, 20],
+                    autoPanPaddingBottomRight: [20, 20]
+                });
+
+                clusteredMarkers.addLayer(marker);
+            });
+
+            // Clear existing clusters
+            map.eachLayer(layer => {
+                if (layer instanceof L.MarkerClusterGroup) {
+                    map.removeLayer(layer);
                 }
-            } catch (error) {
-                dropdown.innerHTML = `<em>Error loading tags</em>`;
-                console.error(`Error loading tags: ${error.message}`);
-            }
-        });
-    }
+            });
 
-    // Photo Upload Preview
-    const photoInput = document.getElementById('photoInput');
-    if (photoInput) {
-        photoInput.addEventListener('change', (e) => {
-            console.log('Photo input changed', e.target.files);
-            const file = e.target.files[0];
-            const previewContainer = document.getElementById('photoPreviewContainer');
-            const previewImage = document.getElementById('photoPreview');
-
-            if (!previewContainer || !previewImage) {
-                console.error('Photo preview elements not found in DOM');
-                return;
+            // Add to map and fit bounds
+            map.addLayer(clusteredMarkers);
+            if (posts.length > 0) {
+                map.fitBounds(clusteredMarkers.getBounds(), {
+                    padding: [50, 50],
+                    maxZoom: 15
+                });
             }
 
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    previewImage.src = event.target.result;
-                    previewContainer.style.display = 'block';
-                    console.log(`Photo selected for upload: ${file.name}`);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                previewContainer.style.display = 'none';
-                console.log('No valid photo selected');
-            }
-        });
-    }
+            // Force redraw
+            setTimeout(() => {
+                map.invalidateSize(true);
+                clusteredMarkers.refreshClusters();
+            }, 100);
 
-    // Show success toast when a post is uploaded
-    const successInput = document.getElementById('postSuccessMessage');
-    if (successInput) {
-        const message = successInput.value;
-        showToast(message);
-        console.log(`Post success message: ${message}`);
-    }
-
-    // Toast Notification Function
-    function showToast(message) {
-        const toast = document.createElement('div');
-        toast.textContent = message;
-        toast.style.position = 'fixed';
-        toast.style.bottom = '30px';
-        toast.style.right = '30px';
-        toast.style.backgroundColor = '#28a745';
-        toast.style.color = 'white';
-        toast.style.padding = '12px 20px';
-        toast.style.borderRadius = '6px';
-        toast.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-        toast.style.zIndex = '9999';
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.4s ease';
-
-        document.body.appendChild(toast);
-        requestAnimationFrame(() => {
-            toast.style.opacity = '1';
-        });
-
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.addEventListener('transitionend', () => {
-                toast.remove();
-            });
-        }, 3000);
-    }
-
-    // Image Modal
-    const modal = document.getElementById('imageModal');
-    if (modal) {
-        const modalImg = document.getElementById('modalImage');
-        const closeBtn = modal.querySelector('.close-modal');
-
-        document.querySelectorAll('.clickable-image').forEach(img => {
-            img.addEventListener('click', () => {
-                modal.style.display = 'flex';
-                if (modalImg) {
-                    modalImg.src = img.src;
-                    console.log(`Image modal opened for: ${img.src}`);
-                }
-            });
-        });
-
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                if (modalImg) modalImg.src = '';
-                console.log('Image modal closed');
-            });
+        } catch (err) {
+            console.error("Map error:", err);
+            alert("Error loading map data. Please try again.");
         }
-
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-                if (modalImg) modalImg.src = '';
-                console.log('Image modal closed by clicking outside');
-            }
-        });
     }
 
-    // Comment Button Functionality
-    document.querySelectorAll('.comment-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            const postCard = button.closest('.post-card');
-            const commentsSection = postCard.querySelector('.comments-section');
-            if (commentsSection) {
-                commentsSection.style.display = commentsSection.style.display === 'none' || commentsSection.style.display === '' ? 'block' : 'none';
-            }
-        });
-    });
+    // Load posts on map initialization
+    loadPostMarkers();
 
-    // Comments Modal Functionality
-    document.querySelectorAll('.show-comments-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const postId = this.getAttribute('data-post-id');
-            const modal = document.getElementById(`comments-modal-${postId}`);
-            const overlay = document.querySelector('.modal-overlay');
-            if (modal && overlay) {
-                modal.style.display = 'block';
-                overlay.style.display = 'block';
-            }
-        });
-    });
+     // ========== Robust Fullscreen Toggle ==========
+    const mapContainer = document.querySelector('.map-container');
+    const viewFullMapBtn = document.getElementById('viewFullMapBtn');
+    let isFullscreen = false;
 
-    document.querySelectorAll('.close-modal').forEach(button => {
-        button.addEventListener('click', function() {
-            const modal = this.closest('.custom-modal');
-            const overlay = document.querySelector('.modal-overlay');
-            if (modal && overlay) {
-                modal.style.display = 'none';
-                overlay.style.display = 'none';
-            }
-        });
-    });
+    function toggleFullscreen(e) {
+    if (e) e.preventDefault();
 
-    // Clipboard Copy for Post URLs
-    function copyPostUrl(postId) {
-        const url = `${window.location.origin}/posts/${postId}`;
-        navigator.clipboard.writeText(url).then(() => {
-            showToast("Post link copied to clipboard!");
-        }).catch(err => {
-            console.error("Failed to copy: ", err);
-        });
+    isFullscreen = !isFullscreen;
+
+    // Toggle classes
+    mapContainer.classList.toggle('fullscreen', isFullscreen);
+    document.body.classList.toggle('fullscreen-map-active', isFullscreen);
+
+    // Update button
+    if (viewFullMapBtn) {
+        const icon = isFullscreen ? 'compress' : 'expand';
+        viewFullMapBtn.innerHTML = `<i class="fas fa-${icon}"></i> ${isFullscreen ? 'Exit Full Map' : 'View Full Map'}`;
+
+        // Ensure button is clickable
+        viewFullMapBtn.style.pointerEvents = 'auto';
+        viewFullMapBtn.style.zIndex = isFullscreen ? '10001' : '1001';
     }
 
-    // Update Tags Preview
-    function updateTagsPreview(tagsArray) {
-        const tagsPreview = document.getElementById('tagsPreview');
-        const selectedTagsInput = document.getElementById('selectedTagsInput');
-        if (!tagsPreview || !selectedTagsInput) return;
-
-        if (tagsArray.length === 0) {
-            tagsPreview.style.display = 'none';
-            tagsPreview.innerHTML = '';
-            selectedTagsInput.value = '';
-            return;
+    // Resize map after transition
+    setTimeout(() => {
+        map.invalidateSize(true);
+        if (isFullscreen && clusteredMarkers) {
+            map.fitBounds(clusteredMarkers.getBounds());
         }
+    }, 100);
+}
 
-        tagsPreview.style.display = 'block';
-        tagsPreview.innerHTML = tagsArray.map(tag => `<span style="background:#e63946; color:#fff; padding: 3px 8px; border-radius: 12px; margin-right: 5px;">${tag}</span>`).join('');
-        selectedTagsInput.value = tagsArray.join(',');
+    // Add click event listener with proper checks
+    if (viewFullMapBtn) {
+        viewFullMapBtn.addEventListener('click', toggleFullscreen);
     }
 
-    // Tags Checkbox Functionality
-    const checkboxes = document.querySelectorAll('.tag-checkbox');
-    const hiddenInput = document.getElementById('selectedTags');
-    if (checkboxes && hiddenInput) {
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                const selected = Array.from(checkboxes)
-                    .filter(cb => cb.checked)
-                    .map(cb => cb.value);
-                hiddenInput.value = selected.join(',');
-            });
-        });
-    }
+    // Add escape key handler
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isFullscreen) {
+            toggleFullscreen(e);
+        }
+    });
 
-    // Passive Touchstart Listener
-    document.addEventListener('touchstart', function() {}, { passive: true });
+    // [Rest of your existing code]
 });

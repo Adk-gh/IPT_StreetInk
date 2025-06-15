@@ -9,24 +9,22 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Models\Post;
 use App\Models\Like;
 use App\Models\Comment;
+use App\Models\Artwork;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+
+ use SoftDeletes, HasApiTokens, HasFactory, Notifiable;
+
+    protected $dates = ['deleted_at'];
 
     protected $primaryKey = 'user_id';
-
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'username',
-        'profile_picture',
-        'profile_completed',
-        'preference',
-        'location',
-    ];
+protected $fillable = [
+    'name', 'email', 'password', 'profile_picture',
+    'phone', 'location', 'bio', 'role', 'status', 'verified_artist'
+];
 
     protected $hidden = [
         'password',
@@ -88,4 +86,10 @@ public function hasSavedPost($postId)
     {
         return $this->hasMany(PostReport::class, 'user_id', 'user_id');
     }
+
+    public function getRouteKeyName()
+{
+    return 'user_id';
+}
+
 }

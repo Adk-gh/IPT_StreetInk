@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Collection;
 use App\Models\StreetArtLocation;
 use App\Models\Post;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,23 +37,20 @@ Route::get('/posts', function () {
        $mappedPosts = $posts->map(function ($post) {
     return [
         'id' => $post->id,
-        'description' => $post->caption,
+        'caption' => $post->caption,
         'latitude' => $post->latitude,
         'longitude' => $post->longitude,
-        'imageUrl' => $post->image_url ? asset('storage/' . $post->image_url) : null,
-        'user' => [
+        'image_url' => $post->image_url ? asset('storage/' . $post->image_url) : null,
+      'user' => [
             'name' => $post->user?->name ?? 'Unknown',
             'email' => $post->user?->email ?? 'N/A',
-       'avatar' => $post->user?->profile
-    ? asset('storage/' . $post->user?->profile)
-    : asset('img/default.jpg'),
-
-
-
+            'profile_picture' => $post->user?->profile_picture // Changed from 'profile'
+                ? asset('storage/' . $post->user?->profile_picture)
+                : asset('img/default.jpg'), // Ensure this file exists
 
         ],
-        'location' => $post->location_name ?? 'Unknown',
-        'created_at' => $post->created_at->diffForHumans(),
+        'location_name' => $post->location_name ?? 'Unknown',
+        'created_at' => $post->created_at->toISOString(),
         'tags' => $post->tags instanceof Collection ? $post->tags->pluck('name') : [],
     ];
 });
@@ -68,4 +66,14 @@ Route::get('/posts', function () {
             'details' => $e->getMessage()
         ], 500);
     }
+});
+// For API-style routes
+Route::middleware(['auth', 'admin'])->group(function() {
+    Route::get('/admin/users/{user}', [UserController::class, 'show'])
+         ->name('admin.users.show');
+});
+
+// Or if using API routes (routes/api.php)
+Route::middleware(['auth:api', 'admin'])->group(function() {
+    Route::get('users/{user}', [UserController::class, 'show']);
 });

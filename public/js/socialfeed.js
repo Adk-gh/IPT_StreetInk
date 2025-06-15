@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!postId) {
                 console.error('Error: Missing post ID for like/unlike action');
-                showToast('Error: Missing post ID', true);
+               
                 return;
             }
 

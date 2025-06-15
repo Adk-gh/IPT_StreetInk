@@ -93,29 +93,36 @@ class AuthController extends Controller
 
         return redirect('/')->with('success', 'You have been signed out successfully.');
     }
+// Show user profile
+public function showProfile()
+{
+    $user = Auth::user();
 
-    // Show user profile
-    public function showProfile()
-    {
-        $user = Auth::user();
-
-        if (!$user) {
-            return redirect()->route('login')->withErrors('You must be logged in to view the profile.');
-        }
-
-        Log::info('User profile accessed', ['user_id' => $user->id]);
-
-        $posts = Post::where('user_id', $user->id)
-            ->with('tags')
-            ->latest()
-            ->get();
-
-        return view('Profile', [
-            'user' => $user,
-            'posts' => $posts,
-            'artworksCount' => $posts->count()
-        ]);
+    if (!$user) {
+        return redirect()->route('login')->withErrors('You must be logged in to view the profile.');
     }
+
+    Log::info('User profile accessed', ['user_id' => $user->id]);
+
+    // Fetch posts WITH likes and tags
+    $posts = Post::where('user_id', $user->id)
+        ->with(['tags', 'likes']) // important to eager load likes
+        ->latest()
+        ->get();
+
+    // Set counts manually like you're doing with artworks
+    $user->artworks_count = $posts->count();
+    $user->likes_count = $posts->sum(function ($post) {
+        return $post->likes->count();
+    });
+
+    return view('Profile', [
+        'user' => $user,
+        'posts' => $posts
+    ]);
+}
+
+
 
     // Update user profile
     public function update(Request $request)

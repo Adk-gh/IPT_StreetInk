@@ -15,6 +15,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="{{ asset('css/admin-artupload.css') }}" rel="stylesheet">
+
+
+    <script src="{{ asset('js/admin-artupload.js') }}" defer></script>
+
     <link href="{{ asset('css/loading.css') }}" rel="stylesheet">
 </head>
 <body>
@@ -132,7 +136,11 @@
                 <table class="posts-table">
                     <thead>
                         <tr>
+
                             <th style="width: 30px;"><input type="checkbox" id="selectAllHeader"></th>
+
+                            <th style="width: 30px;"><input type="checkbox" id="selectAllRows"></th>
+
                             <th>Artwork</th>
                             <th>Artist</th>
                             <th>Location</th>
@@ -149,7 +157,11 @@
                             $sharedByUser = $isShared ? $post->user : null;
                         @endphp
                         <tr data-post-id="{{ $originalPost->id ?? '' }}">
+
                             <td><input type="checkbox" class="post-checkbox"></td>
+
+                            <td><input type="checkbox" class="row-checkbox" data-post='@json($originalPost)' data-user='@json($originalPost->user ?? null)'></td>
+
                             <td>
                                 <div class="art-cell">
                                     @if($originalPost->image_url ?? false)
@@ -185,11 +197,13 @@
                                     @if($originalPost->image_url ?? false)
                                     <span class="tag">#photo</span>
                                     @endif
+
                                     @if($originalPost->tags)
                                         @foreach(explode(',', $originalPost->tags) as $tag)
                                             <span class="tag">#{{ trim($tag) }}</span>
                                         @endforeach
                                     @endif
+
                                 </div>
                             </td>
                             <td>{{ ($originalPost->created_at ?? now())->diffForHumans() }}</td>
@@ -216,6 +230,7 @@
                 </table>
             </div>
 
+
             @if(isset($posts) && $posts->count())
             <div class="pagination">
                 <div class="pagination-info">Showing {{ $posts->firstItem() }} to {{ $posts->lastItem() }} of {{ $posts->total() }} posts</div>
@@ -241,6 +256,147 @@
                     @endif
                 </div>
             </div>
+            @endif
+        </div>
+
+        <!-- Grid View (Dynamic) -->
+        <div class="art-grid" id="gridView" style="display: none;">
+            @forelse($posts ?? [] as $post)
+
+                @php
+                    $isShared = $post instanceof \App\Models\SharedPost;
+                    $originalPost = $isShared ? $post->post : $post;
+                    $sharedByUser = $isShared ? $post->user : null;
+                @endphp
+                <div class="art-card">
+                    @if($originalPost->image_url ?? false)
+                        <img src="{{ asset('storage/' . $originalPost->image_url) }}"
+                             alt="{{ $originalPost->caption ?? 'Artwork' }}"
+                             class="art-card-img"
+                             onclick="openArtModal('{{ $originalPost->caption ?? 'Untitled' }}')">
+                    @endif
+                    <div class="art-card-body">
+                        <div class="art-card-title">{{ Str::limit($originalPost->caption ?? 'Untitled', 25) }}</div>
+                        <div class="art-card-meta">
+                            <span>{{ '@' . ($originalPost->user->username ?? 'unknown') }}</span><br>
+                            <span class="art-card-date">{{ ($originalPost->created_at ?? now())->diffForHumans() }}</span>
+                            <span>{{ $originalPost->location_name ?? 'Unknown' }}</span>
+
+            @php
+                $isShared = $post instanceof \App\Models\SharedPost;
+                $originalPost = ($isShared && isset($post->post) && !is_null($post->post) && is_object($post->post)) ? $post->post : $post;
+                $sharedByUser = ($isShared && is_object($post) && isset($post->user)) ? $post->user : null;
+            @endphp
+            <tr>
+                <td><input type="checkbox"></td>
+                <td>
+                    <div class="art-cell">
+                        @if($originalPost->image_url ?? false)
+                        <div class="art-thumb">
+                            <img src="{{ asset('storage/' . $originalPost->image_url) }}"
+                                 alt="Post Image">
+
+                        </div>
+                        <div class="tags">
+                            <span class="tag">#{{ $isShared ? 'shared' : 'original' }}</span>
+                            @if($originalPost->image_url)
+                                <span class="tag">#photo</span>
+                            @endif
+                        </div>
+                        <div class="art-card-footer">
+                            <div class="art-card-actions">
+                                <button class="action-btn view" title="View" data-post-id="{{ $originalPost->id }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="action-btn approve" title="Approve" data-post-id="{{ $originalPost->id }}">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="action-btn reject" title="Reject" data-post-id="{{ $originalPost->id }}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                </td>
+                <td>{{ Str::limit($originalPost->location_name ?? 'Unknown', 15) }}</td>
+                <td>{{ Str::limit($originalPost->location_name ?? 'Unknown', 15) }}</td>
+                <td>
+                    <div class="tags">
+                        @foreach(explode(',', $originalPost->tags ?? '') as $tag)
+                            @if(trim($tag) !== '')
+                                <span class="tag">#{{ trim($tag) }}</span>
+                            @endif
+                        @endforeach
+                    </div>
+                </td>
+
+                <td>{{ ($originalPost->created_at ?? now())->diffForHumans() }}</td>
+                <td>
+                    <div class="action-btns">
+                        <button class="action-btn view" title="View" data-post-id="{{ $originalPost->id ?? '' }}">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn approve" title="Approve" data-post-id="{{ $originalPost->id ?? '' }}">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button class="action-btn reject" title="Reject" data-post-id="{{ $originalPost->id ?? '' }}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+
+            @empty
+                <p class="text-center w-full">No posts found.</p>
+            @endforelse
+
+
+        </tbody>
+    </table>
+</div>
+<div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-body"></div>
+</div>
+
+@if(isset($posts) && $posts->count())
+<div class="pagination">
+    <div class="pagination-info">Showing {{ $posts->firstItem() }} to {{ $posts->lastItem() }} of {{ $posts->total() }} posts</div>
+    <div class="pagination-btns">
+        @if($posts->onFirstPage())
+            <button class="page-btn disabled"><i class="fas fa-chevron-left"></i></button>
+        @else
+            <a href="{{ $posts->previousPageUrl() }}" class="page-btn"><i class="fas fa-chevron-left"></i></a>
+        @endif
+
+            @if(isset($posts) && $posts->count())
+            <div class="pagination">
+                <div class="pagination-info">Showing {{ $posts->firstItem() }} to {{ $posts->lastItem() }} of {{ $posts->total() }} posts</div>
+                <div class="pagination-btns">
+                    @if($posts->onFirstPage())
+                        <button class="page-btn disabled"><i class="fas fa-chevron-left"></i></button>
+                    @else
+                        <a href="{{ $posts->previousPageUrl() }}" class="page-btn"><i class="fas fa-chevron-left"></i></a>
+                    @endif
+
+                    @foreach(range(1, $posts->lastPage()) as $page)
+                        @if($page == $posts->currentPage())
+                            <button class="page-btn active">{{ $page }}</button>
+                        @else
+                            <a href="{{ $posts->url($page) }}" class="page-btn">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    @if($posts->hasMorePages())
+                        <a href="{{ $posts->nextPageUrl() }}" class="page-btn"><i class="fas fa-chevron-right"></i></a>
+                    @else
+                        <button class="page-btn disabled"><i class="fas fa-chevron-right"></i></button>
+                    @endif
+                </div>
+            </div>
+
             @endif
         </div>
 
@@ -351,6 +507,48 @@
                                     No reports
                                 </div>
                             </div>
+
+
+        </div>
+
+        <!-- Artwork Detail Modal -->
+        <div class="modal" id="artModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modalArtTitle">Artwork Details</h3>
+                    <button class="modal-close" onclick="closeArtModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <img id="modalArtImage" src="" alt="Artwork Preview" class="art-preview">
+                    <div class="art-details">
+                        <div class="detail-group">
+                            <div class="detail-label">Artist</div>
+                            <div class="detail-value" id="modalArtist"></div>
+                        </div>
+                        <div class="detail-group">
+                            <div class="detail-label">Location</div>
+                            <div class="detail-value" id="modalLocation"></div>
+                        </div>
+                        <div class="detail-group">
+                            <div class="detail-label">Coordinates</div>
+                            <div class="detail-value" id="modalCoordinates"></div>
+                        </div>
+                        <div class="detail-group">
+                            <div class="detail-label">Upload Date</div>
+                            <div class="detail-value" id="modalUploadDate"></div>
+                        </div>
+                        <div class="detail-group">
+                            <div class="detail-label">Status</div>
+                            <div class="detail-value" id="modalStatus"></div>
+                        </div>
+                        <div class="detail-group">
+                            <div class="detail-label">Tags</div>
+                            <div class="detail-value" id="modalTags"></div>
+                        </div>
+                        <div class="detail-group">
+                            <div class="detail-label">Description</div>
+                            <div class="detail-value" id="modalDescription"></div>
+
                         </div>
                     </div>
                 </div>
@@ -358,16 +556,27 @@
                     <button class="btn btn-secondary" onclick="closeArtModal()">
                         <i class="fas fa-times"></i> Close
                     </button>
+
                     <button class="btn btn-secondary" id="modalEditBtn">
                         <i class="fas fa-edit"></i> Edit
+
+                    <button class="btn btn-danger" id="modalDeleteBtn" onclick="confirmDeletePost()">
+                        <i class="fas fa-trash"></i> Delete
+
                     </button>
                 </div>
             </div>
         </div>
+
     </div>
 
     <!-- Loading Scripts -->
     <script src="{{ asset('js/admin-artupload.js') }}"></script>
     <script src="{{ asset('js/loading.js') }}"></script>
+
+
+        <script src="{{ asset('js/loading.js') }}"></script>
+    </div>
+
 </body>
 </html>

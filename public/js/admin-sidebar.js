@@ -1,33 +1,43 @@
-// Mobile Menu Toggle
+  // Mobile menu toggle with backdrop
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('backdrop');
 
-        mobileMenuBtn.addEventListener('click', () => {
+        function toggleSidebar() {
             sidebar.classList.toggle('active');
-            mobileMenuBtn.innerHTML = sidebar.classList.contains('active') ?
-                '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
-        });
-
-        // Theme Toggle
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-
-        themeToggle.addEventListener('click', () => {
-            body.setAttribute('data-theme',
-                body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-
-            // Save preference to localStorage
-            localStorage.setItem('theme', body.getAttribute('data-theme'));
-
-            // Update icon
-            themeToggle.innerHTML = body.getAttribute('data-theme') === 'dark' ?
-                '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-        });
-
-        // Check for saved theme preference
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            body.setAttribute('data-theme', savedTheme);
-            themeToggle.innerHTML = savedTheme === 'dark' ?
-                '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            backdrop.classList.toggle('active');
+            // Prevent body scrolling when sidebar is open
+            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
         }
+
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        backdrop.addEventListener('click', toggleSidebar);
+
+        // Touch swipe support
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        sidebar.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        sidebar.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 50) {
+                // Swipe left to close
+                sidebar.classList.remove('active');
+                backdrop.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Close sidebar when clicking a menu item on mobile
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 1200) {
+                    sidebar.classList.remove('active');
+                    backdrop.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });

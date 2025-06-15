@@ -28,26 +28,6 @@
                 <button class="theme-toggle" id="themeToggle">
                     <i class="fas fa-moon"></i>
                 </button>
-                <div class="user-menu">
-                    <div class="user-avatar">
-                        <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : 'img/default.jpg' }}"
-                     alt="{{ Auth::user()->username }}" class="profile-avatar" id="avatarImage">
-                    </div>
-                    <div class="user-name">{{ Auth::user()->name }}</div>
-                    <div class="user-dropdown">
-                        <a href="{{ route('profile') }}" class="dropdown-item"><i class="fas fa-user"></i> Profile</a>
-                        <a href="{{ route('admin.Settings') }}" class="dropdown-item"><i class="fas fa-cog"></i> Settings</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="menu-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </a>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                            @csrf
-                        </form>
-                    </div>
-
-                </div>
 
             </div>
         </div>

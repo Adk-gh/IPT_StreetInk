@@ -13,7 +13,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -121,7 +121,7 @@
 
     <!-- Edit Form Overlay -->
     <div class="edit-form-overlay" id="editFormOverlay"></div>
-    
+
 </section>
 
     <!-- Stats Section -->
@@ -129,24 +129,26 @@
         <div class="container">
             <div class="stats-grid">
 
-                <div class="stat-item">
+<div class="stat-item">
+    <div class="stat-number">{{ $user->artworks_count ?? 0 }}</div>
+    <div class="stat-label">Artworks Uploaded</div>
+</div>
 
-                    <div class="stat-number">  {{ $artworksCount }}</div>
+<div class="stat-item">
+    <div class="stat-number">10.2k</div>
+    <div class="stat-label">Total Followers</div>
+</div>
 
-                    <div class="stat-label">Artworks Uploaded</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">10.2k</div>
-                    <div class="stat-label">Total Followers</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">10.2k</div>
-                    <div class="stat-label">Total Followings</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">1.4k</div>
-                    <div class="stat-label">Likes Received</div>
-                </div>
+<div class="stat-item">
+    <div class="stat-number">10.2k</div>
+    <div class="stat-label">Total Followings</div>
+</div>
+
+<div class="stat-item">
+    <div class="stat-number">{{ $user->likes_count ?? 0 }}</div>
+    <div class="stat-label">Likes Received</div>
+</div>
+
                 <div class="stat-item">
                     <div class="stat-number">10.2k</div>
                     <div class="stat-label">Total Saved</div>
@@ -354,7 +356,7 @@
         <!-- Add this empty div for spacing before footer -->
 <div class="pre-footer-spacing" style="height: 60px;"></div>
     </section>
-    
+
     <!-- Footer -->
     <footer>
     @include('footer')
