@@ -30,12 +30,12 @@
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <header id="header">
-        @include('header')
-    </header>
 </head>
 <body>
     <!-- Header -->
+     <header id="header">
+        @include('header')
+    </header>
 
     <!-- Hero Section -->
     <section class="hero">

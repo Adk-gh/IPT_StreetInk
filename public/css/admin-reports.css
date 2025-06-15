@@ -43,6 +43,119 @@
             background-color: var(--white);
         }
 
+[data-theme="dark"] .data-table {
+    background-color: var(--secondary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .table-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .table-title {
+    color: var(--text);
+}
+
+[data-theme="dark"] th {
+    color: var(--text-light);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] tr:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] .report-type.art {
+    background-color: rgba(78, 115, 223, 0.2);
+    color: #a5b8ff;
+}
+
+[data-theme="dark"] .report-type.comment {
+    background-color: rgba(56, 142, 60, 0.2);
+    color: #81c784;
+}
+
+[data-theme="dark"] .report-type.user {
+    background-color: rgba(142, 36, 170, 0.2);
+    color: #ce93d8;
+}
+
+[data-theme="dark"] .report-type.location {
+    background-color: rgba(245, 124, 0, 0.2);
+    color: #ffb74d;
+}
+
+[data-theme="dark"] .art-artist,
+[data-theme="dark"] .user-email {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .status.open {
+    background-color: rgba(255, 143, 0, 0.2);
+    color: #ffb74d;
+}
+
+[data-theme="dark"] .status.resolved {
+    background-color: rgba(56, 142, 60, 0.2);
+    color: #81c784;
+}
+
+[data-theme="dark"] .status.ignored {
+    background-color: rgba(97, 97, 97, 0.2);
+    color: #bdbdbd;
+}
+
+[data-theme="dark"] .action-btn {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .action-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .action-btn.view {
+    color: #64b5f6;
+}
+
+[data-theme="dark"] .action-btn.resolve {
+    color: #81c784;
+}
+
+[data-theme="dark"] .action-btn.ignore {
+    color: #e57373;
+}
+
+[data-theme="dark"] .pagination {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .pagination-info {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .page-btn {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .page-btn:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .page-btn.active {
+    background-color: var(--accent);
+    color: var(--white);
+}
+
+
+
+
         /* Add this to your existing dark mode styles */
 [data-theme="dark"] .reports-filter {
     background-color: var(--white);

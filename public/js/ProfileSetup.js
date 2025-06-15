@@ -34,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const backBtn2 = document.getElementById('backBtn2');
 
     function updateStep(stepNumber) {
-        // Update active step indicator
         steps.forEach((step, index) => {
             if (index < stepNumber) {
                 step.classList.add('active');
@@ -43,7 +42,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Update form step visibility
         formSteps.forEach((step, index) => {
             if (index === stepNumber - 1) {
                 step.classList.add('active');
@@ -52,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Update progress bar
         if (progressBar) {
             progressBar.style.width = `${(stepNumber / 3) * 100}%`;
         }
@@ -73,15 +70,24 @@ document.addEventListener('DOMContentLoaded', function() {
     if (backBtn1) backBtn1.addEventListener('click', () => updateStep(1));
     if (backBtn2) backBtn2.addEventListener('click', () => updateStep(2));
 
-    // Image Upload Functionality (reusable for both avatar and banner)
-    function setupImageUpload(uploadBtnId, inputId, previewId, imageId, removeBtnId) {
+    // Enhanced Image Upload Functionality
+    function setupImageUpload(uploadBtnId, inputId, previewId, imageId, removeBtnId, removeHiddenId) {
         const uploadBtn = document.getElementById(uploadBtnId);
         const input = document.getElementById(inputId);
         const preview = document.getElementById(previewId);
         const image = document.getElementById(imageId);
         const removeBtn = document.getElementById(removeBtnId);
+        const removeHiddenField = document.getElementById(removeHiddenId);
+        const placeholder = preview.querySelector('.avatar-placeholder i, i');
 
-        if (!uploadBtn || !input || !preview || !image || !removeBtn) return;
+        if (!uploadBtn || !input || !preview || !image || !removeBtn || !placeholder) return;
+
+        // Initialize with existing image
+        if (image.src && image.src !== window.location.href) {
+            image.style.display = 'block';
+            placeholder.style.display = 'none';
+            removeBtn.style.display = 'inline-flex';
+        }
 
         uploadBtn.addEventListener('click', () => input.click());
 
@@ -91,9 +97,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 reader.onload = function(e) {
                     image.src = e.target.result;
                     image.style.display = 'block';
-                    preview.querySelector('i').style.display = 'none';
-                    removeBtn.style.display = 'inline-block';
-                }
+                    placeholder.style.display = 'none';
+                    removeBtn.style.display = 'inline-flex';
+                    if (removeHiddenField) removeHiddenField.value = '0';
+                };
                 reader.readAsDataURL(this.files[0]);
             }
         });
@@ -102,21 +109,26 @@ document.addEventListener('DOMContentLoaded', function() {
             input.value = '';
             image.src = '';
             image.style.display = 'none';
-            preview.querySelector('i').style.display = 'block';
+            placeholder.style.display = 'block';
             removeBtn.style.display = 'none';
+            if (removeHiddenField) removeHiddenField.value = '1';
         });
     }
 
-    // Setup avatar and banner uploads
-    setupImageUpload('uploadBtn', 'avatarInput', 'avatarPreview', 'avatarImage', 'removeBtn');
-    setupImageUpload('uploadBannerBtn', 'bannerInput', 'bannerPreview', 'bannerImage', 'removeBannerBtn');
+    // Initialize image uploaders
+    setupImageUpload('uploadBtn', 'avatarInput', 'avatarPreview', 'avatarImage', 'removeBtn', 'removeProfilePicture');
+    setupImageUpload('uploadBannerBtn', 'bannerInput', 'bannerPreview', 'bannerImage', 'removeBannerBtn', 'removeCoverPhoto');
 
-    // Style Tags Selection with Limit
+    // Tag Selection with Limit
     const tagCheckboxes = document.querySelectorAll('input[name="style-tag"], input[name="style_tag[]"]');
     const tagCounter = document.getElementById('tagCounter');
     const maxTags = 3;
 
     if (tagCheckboxes.length && tagCounter) {
+        // Initialize counter
+        const checkedCount = document.querySelectorAll('input[name="style-tag"]:checked, input[name="style_tag[]"]:checked').length;
+        tagCounter.textContent = `${checkedCount}/${maxTags} tags selected`;
+
         tagCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', function() {
                 const checkedCount = document.querySelectorAll('input[name="style-tag"]:checked, input[name="style_tag[]"]:checked').length;
@@ -138,44 +150,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Form Submission
-    const artIdentityForm = document.getElementById('artIdentityForm');
+    const artIdentityForm = document.getElementById('profileForm');
     if (artIdentityForm) {
         artIdentityForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Get selected tags
-            const selectedTags = [];
-            document.querySelectorAll('input[name="style-tag"]:checked, input[name="style_tag[]"]:checked').forEach(checkbox => {
-                selectedTags.push(checkbox.nextElementSibling.textContent);
-            });
-
-            // Here you would typically send all form data to your backend
-            console.log('Profile setup complete:', {
-                // Step 1 data
-                avatar: document.getElementById('avatarInput').files[0]?.name || null,
-                displayName: document.getElementById('displayName').value,
-                location: document.getElementById('location').value,
-                bio: document.getElementById('bio').value,
-
-                // Step 2 data
-                roles: Array.from(document.querySelectorAll('input[name="role"]:checked')).map(cb => cb.nextElementSibling.textContent),
-                instagram: document.querySelector('.social-link:nth-child(1) input')?.value,
-                twitter: document.querySelector('.social-link:nth-child(2) input')?.value,
-                behance: document.querySelector('.social-link:nth-child(3) input')?.value,
-                website: document.querySelector('.social-link:nth-child(4) input')?.value,
-
-                // Step 3 data
-                banner: document.getElementById('bannerInput').files[0]?.name || null,
-                styleTags: selectedTags
-            });
-
+            // Validation can be added here if needed
             showNotification('Profile setup complete!');
-
-            setTimeout(() => {
-                if (modalOverlay) modalOverlay.style.display = 'none';
-                // In a real app, you would redirect to the profile page
-                // window.location.href = 'profile.html';
-            }, 2000);
         });
     }
 
@@ -190,4 +169,15 @@ document.addEventListener('DOMContentLoaded', function() {
             notification.remove();
         }, 3000);
     }
+
+    // Initialize date picker
+    flatpickr("#birthdate", {
+        theme: "none",
+        dateFormat: "Y-m-d",
+        maxDate: "today",
+        disableMobile: true,
+        nextArrow: '<i class="fas fa-chevron-right"></i>',
+        prevArrow: '<i class="fas fa-chevron-left"></i>',
+        defaultDate: "{{ Auth::user()->birthdate ?? '' }}"
+    });
 });
