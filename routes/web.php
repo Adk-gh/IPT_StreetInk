@@ -13,8 +13,12 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\SavedPostController;
 
 use App\Http\Controllers\ContactController;
+
+use App\Http\Controllers\ArtUploadController;
+
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserManagementController;
+
 
 use Illuminate\Support\Facades\Auth;
 
@@ -77,6 +81,9 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/UserManagement', [AdminController::class, 'showUserManagement'])->name('admin.UserManagement');
 
 
+
+
+
        // User management routes
   // Route::resource('admin/users', UserController::class)->only(['index', 'show', 'update', 'destroy'])->middleware(['auth']);
 
@@ -84,6 +91,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 
     Route::put('/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+
 });
 
 // Logout route
@@ -156,6 +164,15 @@ Route::middleware('auth')->group(function () {
 });
 
 
+Route::prefix('admin')->group(function () {
+    // Art uploads management
+    Route::get('/art-uploads', [ArtUploadController::class, 'index'])->name('admin.art-uploads');
+    Route::get('/posts/{id}', [ArtUploadController::class, 'show']);
+    Route::delete('/posts/{id}', [ArtUploadController::class, 'destroy']);
+    Route::post('/posts/{id}/status', [ArtUploadController::class, 'updateStatus']);
+});
+
+
 Route::get('/admin/posts/{post}', [PostController::class, 'show'])->name('admin.posts.show');
 Route::put('/admin/posts/{post}/status', [PostController::class, 'updateStatus'])->name('admin.posts.updateStatus');
 
@@ -169,3 +186,4 @@ Route::prefix('admin')->group(function() {
 Route::get('/admin/users', [App\Http\Controllers\UserManagementController::class, 'index'])
     ->name('admin.users.index')
     ->middleware('auth:admin');
+
