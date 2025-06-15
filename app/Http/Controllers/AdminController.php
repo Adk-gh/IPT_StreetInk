@@ -18,37 +18,32 @@ use App\Models\SharedPost;
 use App\Models\Comment;
 use App\Models\Tag;
 
-
 class AdminController extends Controller
 {
-    // Optional: Show admin page if email matches
-   public function showAdminDashboard()
-{
-    $user = Auth::user();
+    public function showAdminDashboard()
+    {
+        $user = Auth::user();
 
-    // Check if user is admin
-    if ($user && $user->email === 'admin@gmail.com') {
-        // Add stats data
-        $reportCount = PostReport::count();
-        $stats = [
-            'locations' => Post::count(),
-            'users' => User::count(),
-            'artworks' => Post::count(),
-            'reports' => $reportCount,
-            'verified_artists' => User::where('verified_artist', 1)->count(),
-            'comments' => Comment::count(),
-            // Add other metrics as needed
-        ];
-        $reports = PostReport::with(['post.user', 'user'])
-                ->orderBy('created_at', 'desc')
-                ->paginate(5);
+        if ($user && $user->email === 'admin@gmail.com') {
+            $reportCount = PostReport::count();
+            $stats = [
+                'locations' => Post::count(),
+                'users' => User::count(),
+                'artworks' => Post::count(),
+                'reports' => $reportCount,
+                'verified_artists' => User::where('verified_artist', 1)->count(),
+                'comments' => Comment::count(),
+            ];
+            $reports = PostReport::with(['post.user', 'user'])
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(5);
 
-        return view('admin.Dashboard', compact('user', 'stats', 'reports'));
+            return view('admin.Dashboard', compact('user', 'stats', 'reports'));
+        }
+
+        return redirect()->route('home')
+               ->withErrors(['You do not have permission to access this page.']);
     }
-
-    return redirect()->route('home')
-           ->withErrors(['You do not have permission to access this page.']);
-}
 
     public function showArtistPartner()
     {
@@ -57,7 +52,7 @@ class AdminController extends Controller
 
     public function showArtUpload()
     {
-          $posts = Post::with(['user', 'comments', 'likes'])
+        $posts = Post::with(['user', 'comments', 'likes'])
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
 
@@ -81,40 +76,40 @@ class AdminController extends Controller
                 ->paginate(5);
         return view('admin.Reports', compact('reports'));
     }
-    // In your ReportsController.php
-public function getReportDetails($reportId)
-{
-    try {
-        $report = PostReport::with([
-                'reporter',
-                'post.user',
-                'post'
-            ])
-            ->findOrFail($reportId);
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'id' => $report->id,
-                'reason' => $report->reason,
-                'additional_info' => $report->additional_info,
-                'status' => $report->status,
-                'created_at' => $report->created_at,
-                'reviewed_at' => $report->reviewed_at,
-                'moderator_notes' => $report->moderator_notes,
-                'reporter' => $report->reporter,
-                'reported_user' => $report->post->user ?? null,
-                'post' => $report->post
-            ]
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Report not found',
-            'error' => $e->getMessage()
-        ], 404);
+    public function getReportDetails($reportId)
+    {
+        try {
+            $report = PostReport::with([
+                    'reporter',
+                    'post.user',
+                    'post'
+                ])
+                ->findOrFail($reportId);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $report->id,
+                    'reason' => $report->reason,
+                    'additional_info' => $report->additional_info,
+                    'status' => $report->status,
+                    'created_at' => $report->created_at,
+                    'reviewed_at' => $report->reviewed_at,
+                    'moderator_notes' => $report->moderator_notes,
+                    'reporter' => $report->reporter,
+                    'reported_user' => $report->post->user ?? null,
+                    'post' => $report->post
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Report not found',
+                'error' => $e->getMessage()
+            ], 404);
+        }
     }
-}
 
     public function showSettings()
     {
@@ -130,26 +125,44 @@ public function getReportDetails($reportId)
     {
         return $query->where('verified_artist', 1);
     }
-public function chartData()
-{
-    // Users grouped by date
-    $userGrowth = DB::table('users')
-        ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
-        ->groupBy('date')
-        ->orderBy('date')
-        ->get();
 
-    // Posts grouped by date
-    $artUploads = DB::table('posts')
-        ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
-        ->groupBy('date')
-        ->orderBy('date')
-        ->get();
+    public function chartData()
+    {
+        $userGrowth = DB::table('users')
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
 
-    return response()->json([
-        'userGrowth' => $userGrowth,
-        'artUploads' => $artUploads,
-    ]);
+        $artUploads = DB::table('posts')
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        return response()->json([
+            'userGrowth' => $userGrowth,
+            'artUploads' => $artUploads,
+        ]);
+    }
+
+    public function bulkDeletePosts(Request $request)
+    {
+        try {
+            $postIds = $request->input('postIds', []);
+            
+            // Delete posts
+            Post::whereIn('id', $postIds)->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Posts deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting posts: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
-}
-

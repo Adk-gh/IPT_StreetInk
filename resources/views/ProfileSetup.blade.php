@@ -68,47 +68,53 @@
 
                     <form id="profileForm" action="{{ route('profile.setup.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                       <!-- Profile Picture Upload -->
-<div class="form-group">
-    <label>Profile Picture</label>
-    <div class="avatar-upload">
-        <div class="avatar-preview" id="avatarPreview">
-            <div class="avatar-placeholder">
-                <i class="fas fa-user"></i>
-            </div>
-            <img id="avatarImage" src="" alt="Preview">
+<div class="avatar-upload">
+    <div class="avatar-preview" id="avatarPreview">
+        <div class="avatar-placeholder">
+            <i class="fas fa-user"></i>
         </div>
-        <input type="file" name="profile_picture" id="avatarInput" class="avatar-input" accept="image/*">
-        <div class="avatar-actions">
-            <label for="avatarInput" class="avatar-btn">
-                <i class="fas fa-cloud-upload-alt"></i> Choose photo
-            </label>
-            <button type="button" class="avatar-btn remove" id="removeBtn" style="display: none;">
-                <i class="fas fa-trash"></i>
-            </button>
-        </div>
+        <img id="avatarImage" src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : '' }}" 
+             alt="Preview" style="{{ Auth::user()->profile_picture ? 'display: block;' : 'display: none;' }}">
+    </div>
+    <input type="file" name="profile_picture" id="avatarInput" class="avatar-input" accept="image/*">
+    <input type="hidden" name="remove_profile_picture" id="removeProfilePicture" value="0">
+    <div class="avatar-actions">
+        <label for="avatarInput" class="avatar-btn">
+            <i class="fas fa-cloud-upload-alt"></i> Choose photo
+        </label>
+        <button type="button" class="avatar-btn remove" id="removeBtn" 
+                style="{{ Auth::user()->profile_picture ? 'display: inline-flex;' : 'display: none;' }}">
+            <i class="fas fa-trash"></i> Remove
+        </button>
     </div>
 </div>
 
-                        <!-- Display Name -->
-                        <div class="form-group">
-                            <label for="displayName">Display Name / Artist Name</label>
-                            <input type="text" id="displayName" name="username" class="form-control" placeholder="e.g., ShadowStreak" required>
-                        </div>
+                       <!-- In ProfileSetup.blade.php, update the form fields like this: -->
 
-                        <!-- Location -->
-                        <div class="form-group">
-                            <label for="location">Location</label>
-                            <input type="text" id="location" name="location" class="form-control" placeholder="Your city or country">
-                            <small style="color: var(--text-light); font-size: 0.8rem; display: block; margin-top: 5px;">Helps us connect you with local artists</small>
-                        </div>
+<!-- Display Name -->
+<div class="form-group">
+    <label for="displayName">Display Name / Artist Name</label>
+    <input type="text" id="displayName" name="username" class="form-control" 
+           placeholder="e.g., ShadowStreak" required
+           value="{{ Auth::user()->username ?? '' }}">
+</div>
 
-                        <!-- Short Bio -->
-                        <div class="form-group">
-                            <label for="bio">Short Bio</label>
-                            <textarea id="bio" name="bio" rows="3" class="form-control" placeholder="Tell us about yourself or your art style..."></textarea>
-                            <small style="color: var(--text-light); font-size: 0.8rem; display: block; margin-top: 5px;">Max 150 characters</small>
-                        </div>
+<!-- Location -->
+<div class="form-group">
+    <label for="location">Location</label>
+    <input type="text" id="location" name="location" class="form-control" 
+           placeholder="Your city or country"
+           value="{{ Auth::user()->location ?? '' }}">
+    <small style="color: var(--text-light); font-size: 0.8rem; display: block; margin-top: 5px;">Helps us connect you with local artists</small>
+</div>
+
+<!-- Short Bio -->
+<div class="form-group">
+    <label for="bio">Short Bio</label>
+    <textarea id="bio" name="bio" rows="3" class="form-control" 
+              placeholder="Tell us about yourself or your art style...">{{ Auth::user()->bio ?? '' }}</textarea>
+    <small style="color: var(--text-light); font-size: 0.8rem; display: block; margin-top: 5px;">Max 150 characters</small>
+</div>
 
                         <div class="form-navigation">
                             <button type="button" class="btn btn-primary" id="nextBtn1">Continue</button>
@@ -133,35 +139,38 @@
                     <!-- Phone Number -->
                     <div class="form-group">
                         <label for="phone">Phone Number</label>
-                        <input type="tel" id="phone" name="phone" class="form-control" placeholder="Your phone number">
+                        <input type="tel" id="phone" name="phone" class="form-control" 
+                               placeholder="Your phone number"
+                               value="{{ Auth::user()->phone ?? '' }}">
                     </div>
 
-                    <!-- Social Links -->
-                    <div class="form-group">
-                        <label>Connect your social profiles (optional)</label>
-                        <div class="social-link">
-                            <i class="fab fa-instagram"></i>
-                            <input type="text" class="form-control" name="instagram" placeholder="Instagram username">
-                        </div>
-
-                        <div class="social-link">
-                            <i class="fab fa-twitter"></i>
-                            <input type="text" class="form-control" name="twitter" placeholder="Twitter username">
-                        </div>
-
-                        <div class="social-link">
-                            <i class="fab fa-facebook"></i>
-                            <input type="text" class="form-control" name="facebook" placeholder="Facebook username or URL">
-                        </div>
-                    </div>
-
-                    <div class="form-navigation">
-                        <button type="button" class="btn btn-back" id="backBtn1">
-                            <i class="fas fa-arrow-left"></i> Back
-                        </button>
-                        <button type="button" class="btn btn-primary" id="nextBtn2">Continue</button>
-                    </div>
+                  <!-- Social Links -->
+            <div class="form-group">
+                <label>Connect your social profiles (optional)</label>
+                <div class="social-link">
+                    <i class="fab fa-instagram"></i>
+                    <input type="text" class="form-control" name="instagram" 
+                        placeholder="Instagram username"
+                        value="{{ Auth::user()->instagram ?? '' }}">
                 </div>
+
+                <div class="social-link">
+                    <i class="fab fa-twitter"></i>
+                    <input type="text" class="form-control" name="twitter" 
+                        placeholder="Twitter username"
+                        value="{{ Auth::user()->twitter ?? '' }}">
+                </div>
+
+                <div class="social-link">
+                    <i class="fab fa-facebook"></i>
+                    <input type="text" class="form-control" name="facebook" 
+                        placeholder="Facebook username or URL"
+                        value="{{ Auth::user()->facebook ?? '' }}">
+                </div>
+                </button>
+                                    <button type="button" class="btn btn-primary" id="nextBtn2">Continue</button>
+            </div>
+              </div>
 
                 <!-- Step 3: Art Identity -->
                 <div class="form-step" id="step3">
@@ -231,6 +240,20 @@
   nextArrow: '<i class="fas fa-chevron-right"></i>',
   prevArrow: '<i class="fas fa-chevron-left"></i>',
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Pre-fill existing images
+    const existingAvatar = "{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : '' }}";
+    if (existingAvatar) {
+        document.getElementById('avatarImage').src = existingAvatar;
+    }
+
+    const existingBanner = "{{ Auth::user()->cover_photo ? asset('storage/' . Auth::user()->cover_photo) : '' }}";
+    if (existingBanner) {
+        document.getElementById('bannerImage').src = existingBanner;
+    }
+  });
+
 </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>

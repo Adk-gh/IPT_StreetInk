@@ -400,34 +400,89 @@
             margin-right: 5px;
         }
 
-        /* Tables */
-        .data-table {
-            width: 100%;
-            background-color: var(--white);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
+        /* Update only the table-related styles */
+.data-table {
+    width: 100%;
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 30px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
 
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
+      .table-container {
+    overflow-x: auto;
+    width: 100%;
+}
 
-        .table-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 1200px; /* Increased from previous width */
+}
 
-        .table-actions {
-            display: flex;
-            gap: 10px;
-        }
+th, td {
+    padding: 1.2rem 1.8rem; /* Increased padding for more spacious cells */
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    white-space: nowrap;
+}
 
+th {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background-color: rgba(0, 0, 0, 0.02);
+    position: sticky;
+    top: 0;
+}
+
+tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem; /* Increased gap between avatar and text */
+    min-width: 300px; /* Wider user cell */
+}
+
+.user-avatar-sm {
+    width: 42px; /* Slightly larger avatar */
+    height: 42px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.user-info {
+    min-width: 200px; /* Ensure user info doesn't get squeezed */
+}
+
+.action-btns {
+    display: flex;
+    gap: 0.8rem; /* More space between action buttons */
+}
+
+.action-btn {
+    width: 38px; /* Slightly larger action buttons */
+    height: 38px;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--secondary);
+    color: var(--text);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+/* Keep all other existing styles the same */
         .btn {
             padding: 8px 15px;
             border-radius: var(--border-radius);
@@ -1152,3 +1207,133 @@
             font-size: 0.9rem;
             font-weight: 600;
         }
+/* ===== IMPORTANT USER TABLE WIDENING STYLES ===== */
+/* === INSERT AT BOTTOM OF CSS FILE - DO NOT EDIT === */
+.data-table {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: none !important;
+    background-color: var(--white) !important;
+    border-radius: var(--border-radius) !important;
+    box-shadow: var(--shadow) !important;
+    overflow-x: auto !important;
+    margin-bottom: 30px !important;
+}
+
+.table-container {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+.data-table table {
+    width: 100% !important;
+    min-width: 1400px !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+.data-table th,
+.data-table td {
+    padding: 1.2rem 2rem !important;
+    text-align: left !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+    white-space: nowrap !important;
+}
+
+.data-table th:nth-child(1),
+.data-table td:nth-child(1) {
+    min-width: 300px !important;
+    padding-left: 2.5rem !important;
+}
+
+.data-table th:nth-child(2),
+.data-table td:nth-child(2) {
+    min-width: 120px !important;
+}
+
+.data-table th:nth-child(3),
+.data-table td:nth-child(3) {
+    min-width: 120px !important;
+}
+
+.data-table th:nth-child(4),
+.data-table td:nth-child(4) {
+    min-width: 100px !important;
+    text-align: center !important;
+}
+
+.data-table th:nth-child(5),
+.data-table td:nth-child(5) {
+    min-width: 200px !important;
+}
+
+.data-table th:nth-child(6),
+.data-table td:nth-child(6) {
+    min-width: 150px !important;
+}
+
+.data-table th:nth-child(7),
+.data-table td:nth-child(7) {
+    min-width: 200px !important;
+    padding-right: 2.5rem !important;
+}
+
+.data-table .user-cell {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1.2rem !important;
+    min-width: 280px !important;
+}
+
+.data-table .user-avatar-sm {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+}
+
+.data-table .user-info {
+    min-width: 200px !important;
+}
+
+.data-table .user-name-sm {
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    margin-bottom: 0.2rem !important;
+}
+
+.data-table .user-email {
+    font-size: 0.85rem !important;
+    color: var(--text-light) !important;
+    word-break: break-all !important;
+}
+
+.data-table .action-btns {
+    display: flex !important;
+    gap: 0.8rem !important;
+    justify-content: flex-end !important;
+}
+
+.data-table .action-btn {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: var(--border-radius) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: var(--secondary) !important;
+    color: var(--text) !important;
+    cursor: pointer !important;
+    transition: var(--transition) !important;
+    font-size: 1.1rem !important;
+}
+
+.data-table .action-btn:hover {
+    background-color: var(--accent) !important;
+    color: var(--white) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* === END OF USER TABLE WIDENING STYLES === */
